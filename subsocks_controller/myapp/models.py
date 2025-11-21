@@ -17,7 +17,7 @@ class CertTable(models.Model):
         verbose_name = '证书信息表'
         verbose_name_plural = '证书信息表'
 
-    def __str_(self):
+    def __str__(self):
         return f'CA Info {self.name}'
 
 class AccessTable(models.Model):
@@ -61,3 +61,30 @@ class ServiceTable(models.Model):
 
     def __str__(self):
         return self.name
+
+# access_point ——> service
+class BindTable(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    access_point = models.ForeignKey(AccessTable, on_delete=models.CASCADE, verbose_name='接入点')
+    service = models.ManyToManyField(ServiceTable, verbose_name='服务列表')
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        verbose_name = '服务绑定策略'
+        verbose_name_plural = '服务绑定策略'
+
+    def __str__(self):
+        return f'{self.access_point} - {[', '.join(srv.name for srv in self.service.all())]}'
+
+class DialTable(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    client = models.ForeignKey(ClientTable, on_delete=models.CASCADE, verbose_name='客户端')
+    service = models.ManyToManyField(ServiceTable, verbose_name='服务列表')
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        verbose_name = '服务接入策略'
+        verbose_name_plural = '服务接入策略'
+
+    def __str__(self):
+        return f'{self.client} - {[', '.join(srv.name for srv in self.service.all())]}'

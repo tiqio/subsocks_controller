@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CertTable, AccessTable, ClientTable, ServiceTable
+from .models import CertTable, AccessTable, ClientTable, ServiceTable, BindTable, DialTable
 
 # Register your models here.
 
@@ -50,3 +50,32 @@ class ServiceTableAdmin(admin.ModelAdmin):
         return obj.timestamp.strftime('%Y年%m月%d日-%H时%M分')
 
     formatted_timestamp.short_description = '创建时间'
+
+@admin.register(BindTable)
+class BindTableAdmin(admin.ModelAdmin):
+    list_display = ('id', 'access_point', 'display_service', 'formatted_timestamp')
+    ordering = ('timestamp',)
+
+    def display_service(self, obj):
+        return ', '.join([srv.name for srv in obj.service.all()])
+
+    def formatted_timestamp(self, obj):
+        return obj.timestamp.strftime('%Y年%m月%d日-%H时%M分')
+
+    display_service.short_description = '服务列表'
+    formatted_timestamp.short_description = '创建时间'
+
+@admin.register(DialTable)
+class DialTableAdmin(admin.ModelAdmin):
+    list_display = ('id', 'client', 'display_service', 'formatted_timestamp')
+    ordering = ('timestamp',)
+
+    def display_service(self, obj):
+        return ', '.join([srv.name for srv in obj.service.all()])
+
+    def formatted_timestamp(self, obj):
+        return obj.timestamp.strftime('%Y年%m月%d日-%H时%M分')
+
+    formatted_timestamp.short_description = '创建时间'
+    display_service.short_description = '服务列表'
+

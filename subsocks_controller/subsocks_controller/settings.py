@@ -135,7 +135,7 @@ SIMPLEUI_CONFIG = {
         {
             'app': 'myapp',
             'name': '客户接入机制',
-            'icon': 'fa fa-paper-plane-o',
+            'icon': 'fa fa-mobile',
             'models': [{
                 'name': '客户端表',
                 'icon': 'fa fa-users',
@@ -154,6 +154,19 @@ SIMPLEUI_CONFIG = {
                 'url': 'myapp/servicetable'
             }]
         },{
+            'app': 'myapp',
+            'name': '服务控制策略',
+            'icon': 'fa fa-sitemap',
+            'models': [{
+                'name': '绑定策略',
+                'icon': 'fa fa-server',
+                'url': 'myapp/bindtable'
+            },{
+                'name': '拨入策略',
+                'icon': 'fa fa-mobile',
+                'url': 'myapp/dialtable'
+            }]
+        },{
             'app': 'auth',
             'name': '认证和授权',
             'icon': 'fas fa-shield-alt',
@@ -166,6 +179,7 @@ SIMPLEUI_CONFIG = {
                 'icon': 'fas fa-users-cog',
                 'url': 'auth/group/',
             }]
-        }
+        },
+
     ]
 }
