@@ -1,0 +1,35 @@
+import base64
+import requests
+
+from env import domain
+
+ZITADEL_DOMAIN = domain
+CLIENT_ID = "minnie-mouse"
+CLIENT_SECRET = "itcip78Gmv4xgBLb4y3JNcFRUPG8FlYREpFCcs0Xae7yFCa5lfsrnH8GJ4IBXi8A"
+ZITADEL_TOKEN_URL = f"https://{domain}/oauth/v2/token"
+PROJECT_ID = "347030683681641570"
+
+# Encode the client ID and client secret in Base64
+client_credentials = f"{CLIENT_ID}:{CLIENT_SECRET}".encode("utf-8")
+base64_client_credentials = base64.b64encode(client_credentials).decode("utf-8")
+
+# Request an OAuth token from ZITADEL
+headers = {
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Authorization": f"Basic {base64_client_credentials}"
+}
+
+
+data = {
+    "grant_type": "client_credentials",
+    "scope": f"openid profile email urn:zitadel:iam:org:project:id:{PROJECT_ID}:aud urn:zitadel:iam:org:projects:roles urn:zitadel:iam:user:metadata"
+}
+
+response = requests.post(ZITADEL_TOKEN_URL, headers=headers, data=data)
+
+if response.status_code == 200:
+    access_token = response.json()["access_token"]
+    print(f"Response: {response.json()}")
+    print(f"Access token: {access_token}")
+else:
+    print(f"Error: {response.status_code} - {response.text}")

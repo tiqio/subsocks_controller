@@ -34,20 +34,6 @@ class AccessTable(models.Model):
     def __str__(self):
         return self.name
 
-class ClientTable(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name='ID')
-    name = models.CharField(max_length=100, unique=True, verbose_name='客户端别名')
-    addr = models.CharField(max_length=255, verbose_name='地址 (host:port)')
-    access_point = models.ManyToManyField(AccessTable, verbose_name='接入点列表')
-    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
-
-    class Meta:
-        verbose_name = '客户端表'
-        verbose_name_plural = '客户端表'
-
-    def __str__(self):
-        return self.name
-
 class ServiceTable(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ID')
     name = models.CharField(max_length=100, unique=True, verbose_name='服务别名')
@@ -58,6 +44,21 @@ class ServiceTable(models.Model):
     class Meta:
         verbose_name = '服务表'
         verbose_name_plural = '服务表'
+
+    def __str__(self):
+        return self.name
+
+class ClientTable(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    name = models.CharField(max_length=100, unique=False, verbose_name='客户端别名')
+    # addr = models.CharField(max_length=255, verbose_name='地址 (host:port)')
+    service = models.ManyToManyField(ServiceTable, verbose_name='服务访问列表')
+    access_point = models.ManyToManyField(AccessTable, verbose_name='接入点列表')
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        verbose_name = '客户端表'
+        verbose_name_plural = '客户端表'
 
     def __str__(self):
         return self.name

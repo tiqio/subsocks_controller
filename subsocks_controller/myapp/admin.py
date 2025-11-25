@@ -29,8 +29,11 @@ class AccessTableAdmin(admin.ModelAdmin):
 
 @admin.register(ClientTable)
 class ClientTableAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'addr', 'display_access_point', 'formatted_timestamp')
+    list_display = ('id', 'name', 'display_service', 'display_access_point', 'formatted_timestamp')
     ordering = ('timestamp',)
+
+    def display_service(self, obj):
+        return ', '.join([point.name for point in obj.service.all()])
 
     def display_access_point(self, obj):
         return ', '.join([point.name for point in obj.access_point.all()])
@@ -38,6 +41,7 @@ class ClientTableAdmin(admin.ModelAdmin):
     def formatted_timestamp(self, obj):
         return obj.timestamp.strftime('%Y年%m月%d日-%H时%M分')
 
+    display_service.short_description = '可访问服务名称'
     display_access_point.short_description = '接入点组名称'
     formatted_timestamp.short_description = '创建时间'
 
