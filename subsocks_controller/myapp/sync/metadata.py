@@ -1,3 +1,6 @@
+import base64
+import json
+
 class Metadata:
     def __init__(self, client_type, client_id):
         self.type = client_type
@@ -82,24 +85,74 @@ class ClientMeta:
                     if service not in [s.service_id for s in self.accessinfo[existing_access_ids.index(access.access_id)].services]:
                         self.accessinfo[existing_access_ids.index(access.access_id)].services.append(service)
 
+    def convert_client_meta_to_dict(self):
+        """
+        将 ClientMeta 实例转换为指定的 JSON 格式。
+        :return: 包含 metadata、endpoints 和 accessinfo 的字典
+        """
+        # 转换 metadata
+        metadata_dict = {
+            "type": self.metadata.type,
+            "id": self.metadata.id
+        }
+        metadata_bytes = json.dumps(metadata_dict).encode("utf-8")  # 转换为字节类型
+        metadata_base64 = base64.b64encode(metadata_bytes).decode("utf-8")  # 转换为 Base64 编码字符串
 
-# 示例使用
-metadata1 = Metadata(client_type="client", client_id="Windows11")
-endpoints1 = [Endpoint("IPSB"), Endpoint("YouTube")]
-services1 = [ServiceInfo(service_id="IPSB", delay=100), ServiceInfo(service_id="YouTube", delay=100)]
-accessinfo1 = [AccessInfo(access_id="Ubuntu25", services=services1)]
+        # 转换 endpoints
+        endpoints_list = [endpoint.name for endpoint in self.endpoints]
+        endpoints_bytes = json.dumps(endpoints_list).encode("utf-8")  # 转换为字节类型
+        endpoints_base64 = base64.b64encode(endpoints_bytes).decode("utf-8")  # 转换为 Base64 编码字符串\
 
-client_meta1 = ClientMeta(metadata1, endpoints1, accessinfo1)
+        # 转换 accessinfo
+        accessinfo_list = []
+        for access in self.accessinfo:
+            services_list = [
+                {
+                    "service_id": service.service_id,
+                    "delay": service.delay
+                }
+                for service in access.services
+            ]
+            accessinfo_list.append({
+                "access_id": access.access_id,
+                "services": services_list
+            })
+        accessinfo_bytes = json.dumps(accessinfo_list).encode("utf-8")  # 转换为字节类型
+        accessinfo_base64 = base64.b64encode(accessinfo_bytes).decode("utf-8")  # 转换为 Base64 编码字符串
 
-metadata2 = Metadata(client_type="client", client_id="Windows11")
-endpoints2 = [Endpoint("YouTube")]  # 重复的端点
-services2 = [ServiceInfo(service_id="YouTube", delay=100)]
-accessinfo2 = [AccessInfo(access_id="Ubuntu22", services=services2)]
+        # 构造最终的字典
+        result = {
+            "metadata": metadata_base64,
+            "endpoints": endpoints_base64,
+            "accessinfo": accessinfo_base64
+        }
 
-client_meta2 = ClientMeta(metadata2, endpoints2, accessinfo2)
+        return result
 
-# 合并两个 ClientMeta 实例
-client_meta1.merge(client_meta2)
+if __name__ == '__main__':
+    # 示例使用
+    metadata1 = Metadata(client_type="client", client_id="Windows11")
+    endpoints1 = [Endpoint("IPSB"), Endpoint("YouTube")]
+    services1 = [ServiceInfo(service_id="IPSB", delay=100), ServiceInfo(service_id="YouTube", delay=100)]
+    accessinfo1 = [AccessInfo(access_id="Ubuntu25", services=services1)]
 
-# 打印合并后的结果
-client_meta1.print_structure()
+    client_meta1 = ClientMeta(metadata1, endpoints1, accessinfo1)
+
+    metadata2 = Metadata(client_type="client", client_id="Windows11")
+    endpoints2 = [Endpoint("YouTube")]  # 重复的端点
+    services2 = [ServiceInfo(service_id="YouTube", delay=100)]
+    accessinfo2 = [AccessInfo(access_id="Ubuntu22", services=services2)]
+
+    client_meta2 = ClientMeta(metadata2, endpoints2, accessinfo2)
+
+    # 合并两个 ClientMeta 实例
+    client_meta1.merge(client_meta2)
+
+    # 打印合并后的结果
+    client_meta1.print_structure()
+
+    # 转换为字典格式
+    result = client_meta1.convert_client_meta_to_dict()
+
+    # 打印json结果（metadata）
+    print(json.dumps(result, indent=4))

@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import CertTable, AccessTable, ClientTable, ServiceTable, BindTable, DialTable
 from .sync.metadata import Metadata, Endpoint, AccessInfo, ServiceInfo, ClientMeta
+from .sync.sync import sync_zitadel
 
 # Register your models here.
 
@@ -83,6 +84,9 @@ class ClientTableAdmin(admin.ModelAdmin):
         for client, meta in client_meta_map.items():
             print(f"\n客户端: {client}")
             meta.print_structure()
+
+            # 在zitadel平台创建client名称的ServiceUser，并将meta的相关数据赋值过去
+            sync_zitadel(client, meta.convert_client_meta_to_dict())
 
         self.message_user(request, "同步成功！")
         return
