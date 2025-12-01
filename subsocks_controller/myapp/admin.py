@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import CertTable, AccessTable, ClientTable, ServiceTable, ZitadelTable, BindTable, DialTable
 from .sync.metadata import Metadata, Endpoint, AccessInfo, ServiceInfo, ClientMeta
-from .sync.sync import sync_client_to_zitadel
+from .sync.sync import sync_client_to_zitadel, sync_access_to_zitadel
 
 # Register your models here.
 
@@ -48,6 +48,7 @@ class ClientTableAdmin(admin.ModelAdmin):
 
     def sync_clients(self, request, queryset):
         client_meta_map = {}
+        access_meta_map = {}
 
         for client in queryset:
             services = client.service.all()  # 获取所有相关的 service 对象
@@ -57,7 +58,14 @@ class ClientTableAdmin(admin.ModelAdmin):
             access_names = [access_point.name for access_point in access_points]
 
             print(f"客户端 {client.name} 的服务: {service_names}")
-            print(f"客户端 {client.name} 的接入点: {[access_names]}")
+            print(f"客户端 {client.name} 的接入点: {access_names}")
+
+            for access_name in access_names:
+                if access_name not in access_meta_map:
+                    access_meta_map[access_name] = set()
+
+                # 将可访问服务名称添加到对应接入点组的集合中
+                access_meta_map[access_name].update(service_names)
 
             # 创建ClientMeta实例
             metadata = Metadata(client_type="client", client_id=client.name)
@@ -79,14 +87,17 @@ class ClientTableAdmin(admin.ModelAdmin):
                 # 如果不存在就直接添加
                 client_meta_map[client.name] = client_meta
 
-        # 遍历并打印所有 ClientMeta 实例
-        print("\n所有合并后的 ClientMeta 实例:")
+        # 遍历并打印所有 ClientMeta 实例，同时进行同步
         for client, meta in client_meta_map.items():
             print(f"\n客户端: {client}")
             meta.print_structure()
 
             # 在zitadel平台创建client名称的ServiceUser，并将meta的相关数据赋值过去
             sync_client_to_zitadel(client, meta.convert_client_meta_to_dict())
+
+        # 遍历并打印所有 AccessMeta 实例，同时进行同步
+        for access, meta in access_meta_map.items():
+            sync_access_to_zitadel(access, meta)
 
         self.message_user(request, "同步成功！")
         return
