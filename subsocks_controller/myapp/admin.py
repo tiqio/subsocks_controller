@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import CertTable, AccessTable, ClientTable, ServiceTable, BindTable, DialTable
+from .models import CertTable, AccessTable, ClientTable, ServiceTable, ZitadelTable, BindTable, DialTable
 from .sync.metadata import Metadata, Endpoint, AccessInfo, ServiceInfo, ClientMeta
-from .sync.sync import sync_zitadel
+from .sync.sync import sync_client_to_zitadel
 
 # Register your models here.
 
@@ -86,7 +86,7 @@ class ClientTableAdmin(admin.ModelAdmin):
             meta.print_structure()
 
             # 在zitadel平台创建client名称的ServiceUser，并将meta的相关数据赋值过去
-            sync_zitadel(client, meta.convert_client_meta_to_dict())
+            sync_client_to_zitadel(client, meta.convert_client_meta_to_dict())
 
         self.message_user(request, "同步成功！")
         return
@@ -100,6 +100,16 @@ class ClientTableAdmin(admin.ModelAdmin):
 @admin.register(ServiceTable)
 class ServiceTableAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'addr', 'protocol', 'formatted_timestamp')
+    ordering = ('timestamp',)
+
+    def formatted_timestamp(self, obj):
+        return obj.timestamp.strftime('%Y年%m月%d日-%H时%M分')
+
+    formatted_timestamp.short_description = '创建时间'
+
+@admin.register(ZitadelTable)
+class ZitadelTableAdmin(admin.ModelAdmin):
+    list_display = ('id', 'type', 'client_id', 'client_secret', 'user_id', 'formatted_timestamp')
     ordering = ('timestamp',)
 
     def formatted_timestamp(self, obj):

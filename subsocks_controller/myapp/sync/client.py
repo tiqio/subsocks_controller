@@ -95,7 +95,8 @@ class Client:
         data = res.read()
 
         # 返回响应数据
-        return data.decode("utf-8")
+        user = data.decode("utf-8")
+        return user
 
     def is_result_valid(self, data):
         """
@@ -145,6 +146,7 @@ class Client:
         data = res.read()
         user = data.decode("utf-8")
         user_dict = json.loads(user)
+        print("user_dict", user_dict)
         self.userid = user_dict["id"]
         print("set userid to => ", self.userid)
         return user
@@ -248,7 +250,7 @@ get_user(Y) ——> del_metadata——|
 '''
 if __name__ == "__main__":
     # 从环境变量导入配置
-    from env import domain, token, orgid, userid
+    from env import domain, token, orgid
 
     # 初始化 Client
     client = Client(domain=domain, token=token, orgid=orgid)

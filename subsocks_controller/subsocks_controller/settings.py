@@ -141,17 +141,21 @@ SIMPLEUI_CONFIG = {
                 'icon': 'fa fa-users',
                 'url': 'myapp/clienttable'
             },{
+                'name': 'Zitadel身份表',
+                'icon': 'fa fa-refresh',
+                'url': 'myapp/zitadeltable',
+            },{
                 'name': '接入点表',
                 'icon': 'fa fa-cloud-upload',
                 'url': 'myapp/accesstable'
             },{
-                'name': '证书信息表',
-                'icon': 'fa fa-book',
-                'url': 'myapp/certtable'
-            },{
                 'name': '服务表',
                 'icon': 'fa fa-align-justify',
                 'url': 'myapp/servicetable'
+            },{
+                'name': '证书信息表',
+                'icon': 'fa fa-book',
+                'url': 'myapp/certtable'
             }]
         },{
             'app': 'myapp',

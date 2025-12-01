@@ -4,10 +4,12 @@
 3. 如果指定的用户不存在就添加用户；如果用户已存在就删除旧的元数据并设置新的元数据
 4. 添加密钥已生成clientSecret
 """
+
 from .client import Client
 from .env import domain, token, orgid  # 从配置文件导入环境变量
+from ..models import ZitadelTable
 
-def sync_zitadel(client_name, meta):
+def sync_client_to_zitadel(client_name, meta):
     """
     在 Zitadel 平台同步 ServiceUser 的数据。
     :param client_name: ServiceUser 的名称
@@ -62,6 +64,16 @@ def sync_zitadel(client_name, meta):
     try:
         add_secret_response = client.add_secret()
         print("Add Secret Response:", add_secret_response)
+
+        # 6. 所有操作成功后，更新或创建 ZitadelTable 数据
+        ZitadelTable.objects.update_or_create(
+            user_id=client.userid,
+            defaults={
+                "type": 'Client',
+                "client_id" : client_name,
+                "client_secret" : client.secret,
+            }
+        )
     except Exception as e:
         print(f"Failed to add secret for user '{client_name}': {e}")
         return

@@ -63,6 +63,21 @@ class ClientTable(models.Model):
     def __str__(self):
         return self.name
 
+class ZitadelTable(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name = 'ID')
+    type = models.CharField(max_length=10, choices=[('Client', 'Client'), ('Access', 'Access')], verbose_name='身份类型')
+    client_id = models.CharField(max_length=100, verbose_name='用户名')
+    client_secret = models.CharField(max_length=100, verbose_name='密码')
+    user_id = models.CharField(max_length=100, unique=True, verbose_name='用户ID')
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+    class Meta:
+        verbose_name = 'Zitadel表'
+        verbose_name_plural = 'Zitadel表'
+
+    def __str__(self):
+        return self.client_id
+
 # access_point ——> service
 class BindTable(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ID')
